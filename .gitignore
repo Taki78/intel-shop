@@ -1,0 +1,35 @@
+# ===== Python / Django (backend) =====
+backend/venv/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+backend/staticfiles/
+
+# Logs
+*.log
+
+# Local environment secrets (real .env is never committed; .env.example is)
+.env
+backend/.env
+*.local
+
+# ===== Node / Vite (frontend) =====
+intel-shop/node_modules/
+intel-shop/dist/
+intel-shop/dist-ssr/
+
+# ===== Editors / OS =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.suo
+
+# ===== Claude Code local tooling =====
+.claude/
+
+# NOTE: backend/db.sqlite3 and backend/media/ ARE committed on purpose
+# (full snapshot — products, categories, and uploaded images included).
