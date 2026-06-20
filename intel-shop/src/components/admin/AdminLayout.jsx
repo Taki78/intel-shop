@@ -3,6 +3,7 @@ import { NavLink, Link, Outlet, Navigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Ticket, Settings,
   Cpu, Search, Menu, X, LogOut, ArrowRight, Star, Bell, Clock, FolderOpen,
+  Image as ImageIcon, FileText, Mail, MessageSquare,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { Avatar } from './ui'
@@ -61,6 +62,10 @@ const nav = [
   { to: '/admin/customers', label: 'مشتریان', icon: Users },
   { to: '/admin/reviews', label: 'نظرات', icon: Star },
   { to: '/admin/discounts', label: 'کدهای تخفیف', icon: Ticket },
+  { to: '/admin/slides', label: 'بنرها و اسلایدر', icon: ImageIcon },
+  { to: '/admin/about', label: 'صفحه درباره ما', icon: FileText },
+  { to: '/admin/newsletter', label: 'خبرنامه', icon: Mail },
+  { to: '/admin/messages', label: 'پیام‌های تماس', icon: MessageSquare },
   { to: '/admin/notifications', label: 'اعلان‌ها', icon: Bell },
   { to: '/admin/settings', label: 'تنظیمات', icon: Settings },
 ]
@@ -74,6 +79,10 @@ const titles = {
   '/admin/customers': 'مشتریان',
   '/admin/reviews': 'مدیریت نظرات',
   '/admin/discounts': 'کدهای تخفیف',
+  '/admin/slides': 'مدیریت بنرها و اسلایدر',
+  '/admin/about': 'صفحه درباره ما',
+  '/admin/newsletter': 'مشترکین خبرنامه',
+  '/admin/messages': 'پیام‌های تماس',
   '/admin/notifications': 'مرکز اعلان‌ها',
   '/admin/settings': 'تنظیمات فروشگاه',
 }

@@ -37,6 +37,10 @@ import AdminReviewsPage from './pages/admin/AdminReviewsPage'
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage'
+import AdminSlidesPage from './pages/admin/AdminSlidesPage'
+import AdminAboutPage from './pages/admin/AdminAboutPage'
+import AdminNewsletterPage from './pages/admin/AdminNewsletterPage'
+import AdminMessagesPage from './pages/admin/AdminMessagesPage'
 
 function MainLayout() {
   return (
@@ -76,6 +80,10 @@ export default function App() {
                   <Route path="reviews" element={<AdminReviewsPage />} />
                   <Route path="discounts" element={<AdminDiscountsPage />} />
                   <Route path="categories" element={<AdminCategoriesPage />} />
+                  <Route path="slides" element={<AdminSlidesPage />} />
+                  <Route path="about" element={<AdminAboutPage />} />
+                  <Route path="newsletter" element={<AdminNewsletterPage />} />
+                  <Route path="messages" element={<AdminMessagesPage />} />
                   <Route path="notifications" element={<AdminNotificationsPage />} />
                   <Route path="settings" element={<AdminSettingsPage />} />
                 </Route>

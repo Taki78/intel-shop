@@ -39,6 +39,24 @@ export const adminApi = {
   createDiscount:       (data)       => api.post('/admin/discounts/', data),
   updateDiscount:       (id, data)   => api.patch(`/admin/discounts/${id}/`, data),
   deleteDiscount:       (id)         => api.delete(`/admin/discounts/${id}/`),
+
+  // ─── Content management ──────────────────────────────────────────────────
+  getSlides:            ()           => api.get('/admin/slides/'),
+  createSlide:          (data)       => api.post('/admin/slides/', data),
+  updateSlide:          (id, data)   => api.patch(`/admin/slides/${id}/`, data),
+  deleteSlide:          (id)         => api.delete(`/admin/slides/${id}/`),
+
+  getAbout:             ()           => api.get('/admin/about/'),
+  updateAbout:          (data)       => api.patch('/admin/about/', data),
+
+  getSubscribers:       ()           => api.get('/admin/newsletter/'),
+  updateSubscriber:     (id, data)   => api.patch(`/admin/newsletter/${id}/`, data),
+  deleteSubscriber:     (id)         => api.delete(`/admin/newsletter/${id}/`),
+
+  getMessages:          ()           => api.get('/admin/messages/'),
+  getMessage:           (id)         => api.get(`/admin/messages/${id}/`),
+  updateMessageStatus:  (id, status) => api.patch(`/admin/messages/${id}/`, { status }),
+  deleteMessage:        (id)         => api.delete(`/admin/messages/${id}/`),
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

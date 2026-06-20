@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Cpu, Phone, MapPin, Mail, Share2, Send } from 'lucide-react'
+import { Cpu, Phone, MapPin, Mail, Share2, Send, Check, Loader2 } from 'lucide-react'
 import useShopSettings from '../../utils/useShopSettings'
 import { useCategories } from '../../context/CategoryContext'
+import api from '../../utils/api'
 
 const staticQuickLinks = [
   { label: 'بلاگ', to: '/blog' },
@@ -19,6 +21,26 @@ const userLinks = [
 export default function Footer() {
   const settings = useShopSettings()
   const { categories } = useCategories()
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+
+  async function handleNewsletter(e) {
+    e.preventDefault()
+    if (!newsletterEmail.trim()) return
+    setSubmitting(true); setErrorMsg('')
+    try {
+      await api.post('/content/newsletter/', { email: newsletterEmail.trim() })
+      setSuccess(true)
+      setNewsletterEmail('')
+      setTimeout(() => setSuccess(false), 4000)
+    } catch (err) {
+      setErrorMsg(err.response?.data?.email?.[0] || 'خطا در ثبت ایمیل')
+    } finally {
+      setSubmitting(false)
+    }
+  }
   const storeName = settings?.store_name || 'اینتل شاپ'
   const phone     = settings?.phone     || '۰۲۱-۱۲۳۴۵۶۷۸'
   const email     = settings?.email     || 'info@intelshop.ir'
@@ -115,14 +137,30 @@ export default function Footer() {
               <h4 className="text-white font-bold mb-1">خبرنامه {storeName}</h4>
               <p className="text-sm text-gray-400">از آخرین تخفیفات و محصولات جدید باخبر شوید</p>
             </div>
-            <form className="flex gap-2 w-full sm:w-auto" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="ایمیل شما"
-                className="input bg-gray-800 border-gray-700 text-white placeholder-gray-500 flex-1 sm:w-64"
-              />
-              <button type="submit" className="btn-primary whitespace-nowrap">عضویت</button>
-            </form>
+            <div className="w-full sm:w-auto">
+              {success ? (
+                <div className="flex items-center gap-2 text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-xl px-4 py-2.5 text-sm">
+                  <Check size={16} /> ایمیل شما با موفقیت ثبت شد
+                </div>
+              ) : (
+                <form className="flex gap-2 w-full sm:w-auto" onSubmit={handleNewsletter}>
+                  <input
+                    type="email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    placeholder="ایمیل شما"
+                    required
+                    dir="ltr"
+                    className="input bg-gray-800 border-gray-700 text-white placeholder-gray-500 flex-1 sm:w-64"
+                  />
+                  <button type="submit" disabled={submitting} className="btn-primary whitespace-nowrap gap-2">
+                    {submitting && <Loader2 size={14} className="animate-spin" />}
+                    عضویت
+                  </button>
+                </form>
+              )}
+              {errorMsg && <p className="text-xs text-red-400 mt-1.5">{errorMsg}</p>}
+            </div>
           </div>
         </div>
 

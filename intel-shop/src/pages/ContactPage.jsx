@@ -1,14 +1,26 @@
 import { useState } from 'react'
-import { Phone, Mail, MapPin, Clock, CheckCircle } from 'lucide-react'
+import { Phone, Mail, MapPin, Clock, CheckCircle, Loader2 } from 'lucide-react'
+import api from '../utils/api'
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [sent, setSent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    setSent(true)
-    setForm({ name: '', email: '', subject: '', message: '' })
+    setSubmitting(true); setErrorMsg('')
+    try {
+      await api.post('/content/contact/', form)
+      setSent(true)
+      setForm({ name: '', email: '', subject: '', message: '' })
+    } catch (err) {
+      const d = err.response?.data || {}
+      setErrorMsg(d.email?.[0] || d.detail || 'خطا در ارسال پیام')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -50,6 +62,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <h2 className="font-bold text-gray-800 text-lg mb-4">ارسال پیام</h2>
+                {errorMsg && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{errorMsg}</p>}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-gray-500 mb-1 block">نام</label>
@@ -68,7 +81,10 @@ export default function ContactPage() {
                   <label className="text-xs text-gray-500 mb-1 block">پیام</label>
                   <textarea value={form.message} onChange={e => setForm(p => ({...p, message: e.target.value}))} className="input resize-none" rows={5} placeholder="پیام خود را بنویسید..." required />
                 </div>
-                <button type="submit" className="btn-primary w-full justify-center py-3">ارسال پیام</button>
+                <button type="submit" disabled={submitting} className="btn-primary w-full justify-center py-3 gap-2">
+                  {submitting && <Loader2 size={16} className="animate-spin" />}
+                  {submitting ? 'در حال ارسال...' : 'ارسال پیام'}
+                </button>
               </form>
             )}
           </div>
