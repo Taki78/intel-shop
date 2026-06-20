@@ -36,6 +36,7 @@ LOCAL_APPS = [
     'apps.admin_api',
     'apps.blog',
     'apps.content',
+    'apps.notifications',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -113,6 +114,16 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+# ─── Notifications (SMS + Email) ─────────────────────────────────────────────
+# Swap providers by changing these. Console backends print to stdout — perfect
+# for dev. When you're ready for production, set SMS_BACKEND to e.g.
+# 'apps.notifications.sms_backends.KavenegarSMSBackend' and EMAIL_BACKEND to
+# Django's SMTP backend (django.core.mail.backends.smtp.EmailBackend) + EMAIL_HOST/PORT/USER/PASS.
+SMS_BACKEND = os.environ.get('SMS_BACKEND', 'apps.notifications.sms_backends.ConsoleSMSBackend')
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'اینتل شاپ <no-reply@intelshop.ir>')
+
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^http://localhost:\d+$',

@@ -82,34 +82,60 @@ class Address(models.Model):
         return f'{self.user.name} — {self.city}'
 
 
-class PasswordResetOTP(models.Model):
-    method = models.CharField(max_length=10, choices=[('email', 'ایمیل'), ('phone', 'موبایل')])
-    value = models.CharField(max_length=150)
-    code = models.CharField(max_length=6)
-    reset_token = models.CharField(max_length=64, blank=True)
-    used = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+class OTPCode(models.Model):
+    """One-time code for register-verify, password-reset, and future flows
+    like email-change. The same table serves all purposes — distinguished by
+    `purpose`."""
+    PURPOSE_CHOICES = [
+        ('register', 'تأیید ثبت‌نام'),
+        ('reset',    'بازیابی رمز عبور'),
+    ]
+    METHOD_CHOICES = [
+        ('email', 'ایمیل'),
+        ('phone', 'موبایل'),
+    ]
+
+    purpose      = models.CharField(max_length=10, choices=PURPOSE_CHOICES)
+    method       = models.CharField(max_length=10, choices=METHOD_CHOICES)
+    value        = models.CharField(max_length=150)  # email or phone
+    code         = models.CharField(max_length=6)
+    # Short-lived token issued after the code is verified, used to finalize
+    # the action (register-complete or password-reset) without re-sending the code.
+    proof_token  = models.CharField(max_length=64, blank=True)
+    used         = models.BooleanField(default=False)
+    created_at   = models.DateTimeField(auto_now_add=True)
+    expires_at   = models.DateTimeField()
 
     class Meta:
-        verbose_name = 'کد بازیابی رمز'
+        verbose_name = 'کد یک‌بارمصرف'
+        verbose_name_plural = 'کدهای یک‌بارمصرف'
+        indexes = [models.Index(fields=['purpose', 'method', 'value'])]
+
+    LIFETIME = timedelta(minutes=2)
 
     @classmethod
-    def generate(cls, method, value):
-        cls.objects.filter(method=method, value=value, used=False).delete()
+    def generate(cls, purpose, method, value):
+        """Invalidate any outstanding unused codes for the same (purpose,method,value)
+        and issue a fresh one. Returns the new instance."""
+        cls.objects.filter(purpose=purpose, method=method, value=value, used=False).update(used=True)
         return cls.objects.create(
+            purpose=purpose,
             method=method,
             value=value,
-            code=str(random.randint(100000, 999999)),
-            expires_at=timezone.now() + timedelta(minutes=2),
+            code=f'{random.randint(0, 999999):06d}',
+            expires_at=timezone.now() + cls.LIFETIME,
         )
 
     def is_valid(self):
         return not self.used and timezone.now() < self.expires_at
 
-    def verify_and_get_token(self, code):
+    def verify(self, code):
+        """If `code` matches and is still valid, mint a short proof_token and
+        return it. Otherwise return None. Note: this does NOT mark the OTP as
+        used — the caller marks it used on successful finalize, so the proof
+        remains valid until the user completes the next step."""
         if self.code == code and self.is_valid():
-            self.reset_token = secrets.token_urlsafe(32)
-            self.save(update_fields=['reset_token'])
-            return self.reset_token
+            self.proof_token = secrets.token_urlsafe(32)
+            self.save(update_fields=['proof_token'])
+            return self.proof_token
         return None

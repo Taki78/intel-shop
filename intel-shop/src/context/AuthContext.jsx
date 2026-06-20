@@ -45,28 +45,9 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function register(name, email, phone, password) {
-    setLoading(true)
-    setError(null)
-    try {
-      const { data } = await api.post('/auth/register/', { name, email, phone, password, confirm: password })
-      saveSession(data.user, { access: data.access, refresh: data.refresh })
-      return { success: true }
-    } catch (err) {
-      const e = err.response?.data || {}
-      const msg =
-        e.email?.[0] ||
-        e.phone?.[0] ||
-        e.name?.[0] ||
-        e.password?.[0] ||
-        e.non_field_errors?.[0] ||
-        e.detail ||
-        'خطا در ثبت‌نام'
-      setError(msg)
-      return { success: false }
-    } finally {
-      setLoading(false)
-    }
+  /** Called by RegisterPage after the 3-step verify-first flow completes. */
+  function adoptSession({ user, access, refresh }) {
+    saveSession(user, { access, refresh })
   }
 
   async function logout() {
@@ -91,7 +72,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, setError, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading, error, setError, login, adoptSession, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )
