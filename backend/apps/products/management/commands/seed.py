@@ -3,12 +3,18 @@ from apps.products.models import Category, Brand, Product, ProductImage, Product
 from apps.discounts.models import DiscountCode
 
 CATEGORIES = [
-    {'name': 'لپ‌تاپ نو', 'slug': 'laptop-new', 'icon': 'laptop', 'order': 1},
-    {'name': 'لپ‌تاپ دست دوم', 'slug': 'laptop-used', 'icon': 'laptop', 'order': 2},
-    {'name': 'قطعات کامپیوتر', 'slug': 'parts', 'icon': 'cpu', 'order': 3},
+    {'name': 'لپ‌تاپ نو',       'slug': 'laptop-new',  'icon': 'laptop',   'order': 1},
+    {'name': 'لپ‌تاپ دست دوم', 'slug': 'laptop-used', 'icon': 'laptop',   'order': 2},
+    {'name': 'قطعات کامپیوتر', 'slug': 'parts',       'icon': 'cpu',      'order': 3},
+    {'name': 'کامپیوتر',        'slug': 'desktop',     'icon': 'monitor',  'order': 4},
+    {'name': 'کنسول',           'slug': 'console',     'icon': 'gamepad',  'order': 5},
 ]
 
-BRANDS = ['Lenovo', 'HP', 'Dell', 'Asus', 'Acer', 'MSI', 'Apple', 'Samsung', 'Corsair', 'Kingston', 'Intel', 'AMD']
+BRANDS = [
+    'Lenovo', 'HP', 'Dell', 'Asus', 'Acer', 'MSI', 'Apple',
+    'Samsung', 'Corsair', 'Kingston', 'Intel', 'AMD',
+    'Sony', 'Microsoft', 'Nintendo',
+]
 
 PRODUCTS = [
     {
@@ -278,6 +284,120 @@ PRODUCTS = [
         'specs': {'cpu': 'Intel Core i7-12650H', 'ram': '16GB DDR5', 'storage': '512GB NVMe SSD',
                   'gpu': 'NVIDIA GeForce RTX 3050 4GB', 'display': '15.6 اینچ FHD IPS 120Hz',
                   'os': 'Windows 11 Home', 'weight': '2.2 کیلوگرم', 'battery': '45Wh'},
+    },
+]
+
+    # ===== DESKTOP COMPUTERS =====
+    {
+        'slug': 'desktop-intel-i5-12400-16gb-512',
+        'name': 'کامپیوتر رومیزی Intel Core i5-12400 / 16GB / 512GB SSD',
+        'category': 'desktop', 'brand': 'Intel', 'condition': 'new',
+        'warranty': '۱۲ ماه گارانتی', 'price': 24500000, 'discount_price': 22900000,
+        'stock': 8, 'rating': '4.4', 'reviews_count': 18, 'tags': ['پیشنهاد ویژه'], 'featured': True,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1660838613_1714087.jpg',
+            'https://static.bhphoto.com/images/images1000x1000/1660838613_1714088.jpg',
+        ],
+        'specs': {'cpu': 'Intel Core i5-12400 | 6 هسته/12 رشته | بوست 4.4GHz',
+                  'ram': '16GB DDR4 3200MHz', 'storage': '512GB NVMe SSD',
+                  'gpu': 'Intel UHD Graphics 730 (داخلی)', 'os': 'Windows 11 Home',
+                  'weight': 'کیس مینی‌تاور'},
+    },
+    {
+        'slug': 'desktop-gaming-i7-rtx3060-32gb',
+        'name': 'کامپیوتر گیمینگ Core i7-12700 / 32GB / RTX 3060 / 1TB',
+        'category': 'desktop', 'brand': 'Asus', 'condition': 'new',
+        'warranty': '۱۸ ماه گارانتی', 'price': 78000000, 'discount_price': None,
+        'stock': 3, 'rating': '4.8', 'reviews_count': 11, 'tags': ['گیمینگ', 'پرفروش'], 'featured': True,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1736804688_1861900.jpg',
+            'https://static.bhphoto.com/images/images1000x1000/1736804688_1861901.jpg',
+        ],
+        'specs': {'cpu': 'Intel Core i7-12700 | 12 هسته | بوست 4.9GHz',
+                  'ram': '32GB DDR4 3200MHz Dual Channel',
+                  'storage': '1TB NVMe PCIe 4.0 SSD',
+                  'gpu': 'NVIDIA GeForce RTX 3060 12GB GDDR6',
+                  'os': 'Windows 11 Home', 'weight': 'کیس میدتاور'},
+    },
+    {
+        'slug': 'desktop-ryzen5-5600g-apu-16gb',
+        'name': 'کامپیوتر رومیزی AMD Ryzen 5 5600G APU / 16GB / 480GB',
+        'category': 'desktop', 'brand': 'AMD', 'condition': 'new',
+        'warranty': '۱۲ ماه گارانتی', 'price': 19800000, 'discount_price': 18500000,
+        'stock': 10, 'rating': '4.2', 'reviews_count': 25, 'tags': ['مقرون‌به‌صرفه'], 'featured': False,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1660838613_1714087.jpg',
+        ],
+        'specs': {'cpu': 'AMD Ryzen 5 5600G | گرافیک Vega 7 داخلی',
+                  'ram': '16GB DDR4 3200MHz', 'storage': '480GB SATA SSD',
+                  'gpu': 'AMD Radeon Vega 7 (داخلی)', 'os': 'Windows 11 Home',
+                  'weight': 'کیس مینی‌تاور'},
+    },
+
+    # ===== GAMING CONSOLES =====
+    {
+        'slug': 'sony-playstation5-disc',
+        'name': 'کنسول بازی Sony PlayStation 5 (نسخه دیسک)',
+        'category': 'console', 'brand': 'Sony', 'condition': 'new',
+        'warranty': '۱۲ ماه گارانتی', 'price': 52000000, 'discount_price': 49000000,
+        'stock': 5, 'rating': '4.9', 'reviews_count': 67, 'tags': ['پرفروش', 'جدید'], 'featured': True,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1737647419_1864523.jpg',
+            'https://static.bhphoto.com/images/images1000x1000/1702401817_1785527.jpg',
+        ],
+        'specs': {'cpu': 'AMD Zen 2 | 8 هسته 3.5GHz',
+                  'gpu': 'AMD RDNA 2 | 10.28 TFLOPS | 4K/120fps',
+                  'storage': '825GB NVMe SSD | حداکثر خواندن 5.5GB/s',
+                  'ram': '16GB GDDR6', 'os': 'PlayStation OS',
+                  'weight': '4.5 کیلوگرم'},
+    },
+    {
+        'slug': 'microsoft-xbox-series-x',
+        'name': 'کنسول بازی Microsoft Xbox Series X',
+        'category': 'console', 'brand': 'Microsoft', 'condition': 'new',
+        'warranty': '۱۲ ماه گارانتی', 'price': 48000000, 'discount_price': None,
+        'stock': 4, 'rating': '4.8', 'reviews_count': 42, 'tags': ['جدید'], 'featured': True,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1730730710_1844786.jpg',
+            'https://static.bhphoto.com/images/images1000x1000/1717445993_1815741.jpg',
+        ],
+        'specs': {'cpu': 'AMD Zen 2 | 8 هسته 3.8GHz',
+                  'gpu': 'AMD RDNA 2 | 12 TFLOPS | 4K/120fps',
+                  'storage': '1TB NVMe SSD سفارشی',
+                  'ram': '16GB GDDR6 + 10GB DDR4', 'os': 'Xbox OS',
+                  'weight': '4.45 کیلوگرم'},
+    },
+    {
+        'slug': 'nintendo-switch-oled',
+        'name': 'کنسول بازی Nintendo Switch OLED',
+        'category': 'console', 'brand': 'Nintendo', 'condition': 'new',
+        'warranty': '۶ ماه گارانتی', 'price': 22000000, 'discount_price': 20500000,
+        'stock': 9, 'rating': '4.7', 'reviews_count': 89, 'tags': ['پرفروش', 'تخفیف'], 'featured': False,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1633028834_1666234.jpg',
+            'https://static.bhphoto.com/images/images1000x1000/1633028834_1666235.jpg',
+        ],
+        'specs': {'cpu': 'NVIDIA Tegra X1+ | ARM Cortex-A57',
+                  'gpu': 'NVIDIA Maxwell 256 CUDA',
+                  'storage': '64GB داخلی + پشتیبانی از MicroSD تا 2TB',
+                  'display': '7 اینچ OLED | 1280×720 | 60fps',
+                  'battery': '4310mAh | 4.5-9 ساعت',
+                  'weight': '420 گرم'},
+    },
+    {
+        'slug': 'sony-playstation5-slim-digital',
+        'name': 'کنسول بازی Sony PlayStation 5 Slim (نسخه دیجیتال)',
+        'category': 'console', 'brand': 'Sony', 'condition': 'new',
+        'warranty': '۱۲ ماه گارانتی', 'price': 42000000, 'discount_price': 39500000,
+        'stock': 6, 'rating': '4.8', 'reviews_count': 34, 'tags': ['جدید', 'تخفیف'], 'featured': False,
+        'images': [
+            'https://static.bhphoto.com/images/images1000x1000/1699539282_1794282.jpg',
+        ],
+        'specs': {'cpu': 'AMD Zen 2 | 8 هسته 3.5GHz',
+                  'gpu': 'AMD RDNA 2 | 10.28 TFLOPS | 4K/120fps',
+                  'storage': '1TB NVMe SSD',
+                  'ram': '16GB GDDR6', 'os': 'PlayStation OS',
+                  'weight': '3.2 کیلوگرم (سبک‌تر از نسل قبل)'},
     },
 ]
 
