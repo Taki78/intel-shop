@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, Navigate } from 'react-router-dom'
 import {
   Cpu, Mail, Smartphone, ArrowRight, ArrowLeft, Loader2, ShieldCheck,
 } from 'lucide-react'
@@ -205,7 +205,9 @@ function StepDetails({ method, form, setField, onSubmit, loading, error }) {
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { adoptSession } = useAuth()
+  const { user, adoptSession } = useAuth()
+
+  if (user) return <Navigate to="/account" replace />
 
   const [step, setStep] = useState(STEPS.CHANNEL)
   const [method, setMethod] = useState('email')

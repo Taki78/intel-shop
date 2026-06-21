@@ -26,6 +26,7 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import NotFoundPage from './pages/NotFoundPage'
 import InvoicePage from './pages/InvoicePage'
+import PaymentResultPage from './pages/PaymentResultPage'
 import AdminLayout from './components/admin/AdminLayout'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminProductsPage from './pages/admin/AdminProductsPage'
@@ -95,6 +96,7 @@ export default function App() {
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/invoice/:orderNumber" element={<InvoicePage />} />
+                  <Route path="/payment/result" element={<PaymentResultPage />} />
                   <Route path="/account" element={<AccountPage />} />
                   <Route path="/wishlist" element={<WishlistPage />} />
                   <Route path="/compare" element={<ComparePage />} />

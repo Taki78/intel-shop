@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Store, Truck, CreditCard, Bell, Check, Save, Loader2 } from 'lucide-react'
+import { Store, Truck, CreditCard, Bell, Shield, Check, Save, Loader2 } from 'lucide-react'
 import { SectionCard } from '../../components/admin/ui'
 import { adminApi } from '../../utils/adminApi'
 
@@ -33,6 +33,7 @@ const DEFAULTS = {
   free_shipping_enabled: true, free_shipping_over: 5000000, express_enabled: true,
   payment_online: true, payment_cod: true, payment_installment: false,
   notify_new_order: true, notify_low_stock: true, notify_new_user: false,
+  enamad_html: '',
 }
 
 export default function AdminSettingsPage() {
@@ -72,6 +73,7 @@ export default function AdminSettingsPage() {
         notify_new_order:      form.notify_new_order,
         notify_low_stock:      form.notify_low_stock,
         notify_new_user:       form.notify_new_user,
+        enamad_html:           form.enamad_html,
       })
       setForm(data)
       setSaved(true)
@@ -164,6 +166,33 @@ export default function AdminSettingsPage() {
           <Row title="کاربر جدید" desc="اطلاع‌رسانی عضویت کاربر جدید">
             <Toggle on={form.notify_new_user} onChange={setB('notify_new_user')} />
           </Row>
+        </div>
+      </SectionCard>
+
+      {/* E-Namad */}
+      <SectionCard title="نماد اعتماد الکترونیکی (اینماد)" icon={Shield}>
+        <div className="p-5 space-y-3">
+          <p className="text-xs text-gray-500">
+            از سایت <span dir="ltr" className="font-mono">enamad.ir</span> کد HTML نماد خود را دریافت کرده و اینجا paste کنید.
+            این badge در فوتر سایت نمایش داده می‌شود.
+          </p>
+          <textarea
+            value={form.enamad_html}
+            onChange={set('enamad_html')}
+            className="input resize-none font-mono text-xs"
+            rows={5}
+            dir="ltr"
+            placeholder={'<a referrerpolicy=\'origin\' target=\'_blank\' href=\'https://trustseal.enamad.ir/...\'>\n  <img ... />\n</a>'}
+          />
+          {form.enamad_html && (
+            <div className="flex items-center gap-3">
+              <p className="text-xs text-gray-400">پیش‌نمایش:</p>
+              <div
+                className="inline-block"
+                dangerouslySetInnerHTML={{ __html: form.enamad_html }}
+              />
+            </div>
+          )}
         </div>
       </SectionCard>
 

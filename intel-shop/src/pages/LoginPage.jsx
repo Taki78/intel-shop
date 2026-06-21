@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { Cpu, Eye, EyeOff, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -7,11 +7,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const { login, loading, error } = useAuth()
+  const { user, login, loading, error } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const adminOnly = location.state?.adminOnly
   const next      = location.state?.next
+
+  if (user) return <Navigate to="/account" replace />
 
   async function handleSubmit(e) {
     e.preventDefault()

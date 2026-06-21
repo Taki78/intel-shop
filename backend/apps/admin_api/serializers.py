@@ -247,4 +247,5 @@ class ShopSettingsSerializer(serializers.ModelSerializer):
             'free_shipping_enabled', 'free_shipping_over', 'express_enabled',
             'payment_online', 'payment_cod', 'payment_installment',
             'notify_new_order', 'notify_low_stock', 'notify_new_user',
+            'enamad_html',
         ]

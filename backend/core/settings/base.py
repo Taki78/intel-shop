@@ -115,6 +115,18 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+# ─── Payment gateway ──────────────────────────────────────────────────────────
+# Swap by changing PAYMENT_BACKEND. MockPaymentBackend simulates payment for dev.
+# In production set to e.g. 'apps.payments.backends.ZarinPalBackend' and add the
+# corresponding key (ZARINPAL_MERCHANT_ID or IDPAY_API_KEY).
+PAYMENT_BACKEND     = os.environ.get('PAYMENT_BACKEND', 'apps.payments.backends.MockPaymentBackend')
+ZARINPAL_MERCHANT_ID = os.environ.get('ZARINPAL_MERCHANT_ID', '')
+ZARINPAL_SANDBOX    = os.environ.get('ZARINPAL_SANDBOX', 'False') == 'True'
+IDPAY_API_KEY       = os.environ.get('IDPAY_API_KEY', '')
+IDPAY_SANDBOX       = os.environ.get('IDPAY_SANDBOX', 'False') == 'True'
+# Your public site URL — used to build the payment callback URL and redirect URLs.
+SITE_URL = os.environ.get('SITE_URL', 'http://localhost:5173')
+
 # ─── Notifications (SMS + Email) ─────────────────────────────────────────────
 # Swap providers by changing these. Console backends print to stdout — perfect
 # for dev. When you're ready for production, set SMS_BACKEND to e.g.

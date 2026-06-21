@@ -83,7 +83,7 @@ export default function CheckoutPage() {
         payment_method:    paymentMethod,
       })
 
-      // Cache for InvoicePage
+      // Cache for InvoicePage (used after payment return)
       localStorage.setItem('intel-shop-last-order', JSON.stringify({
         orderNumber:    order.order_number,
         invoiceNumber:  order.invoice_number,
@@ -96,6 +96,15 @@ export default function CheckoutPage() {
         discountCode:   discount?.code || null,
       }))
 
+      if (paymentMethod === 'online') {
+        // Redirect to payment gateway — backend handles callback & redirect back
+        const { data: pay } = await api.post(`/orders/${order.id}/payment/initiate/`)
+        clearCart()
+        window.location.href = pay.payment_url
+        return
+      }
+
+      // COD — go straight to confirmation step
       setConfirmedOrder(order)
       clearCart()
       setStep(3)

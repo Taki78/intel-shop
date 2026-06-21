@@ -19,6 +19,12 @@ class ShopSettings(models.Model):
     notify_low_stock = models.BooleanField(default=True, verbose_name='موجودی کم')
     notify_new_user  = models.BooleanField(default=False, verbose_name='کاربر جدید')
 
+    enamad_html = models.TextField(
+        blank=True,
+        verbose_name='کد نماد اعتماد الکترونیکی (اینماد)',
+        help_text='کد HTML که از سایت enamad.ir دریافت می‌کنید را اینجا paste کنید',
+    )
+
     class Meta:
         verbose_name        = 'تنظیمات فروشگاه'
         verbose_name_plural = 'تنظیمات فروشگاه'

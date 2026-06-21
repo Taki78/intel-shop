@@ -164,11 +164,22 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500">
+        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
           <p>© ۱۴۰۳ {storeName}. تمامی حقوق محفوظ است.</p>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-gray-300 transition-colors">قوانین و مقررات</a>
-            <a href="#" className="hover:text-gray-300 transition-colors">حریم خصوصی</a>
+
+          <div className="flex items-center gap-6">
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-gray-300 transition-colors">قوانین و مقررات</a>
+              <a href="#" className="hover:text-gray-300 transition-colors">حریم خصوصی</a>
+            </div>
+
+            {/* E-Namad trust badge — HTML comes from admin settings */}
+            {settings?.enamad_html && (
+              <div
+                className="enamad-badge"
+                dangerouslySetInnerHTML={{ __html: settings.enamad_html }}
+              />
+            )}
           </div>
         </div>
       </div>

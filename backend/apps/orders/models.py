@@ -87,6 +87,30 @@ class OrderNote(models.Model):
         return f'Note on {self.order.order_number}'
 
 
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار'),
+        ('paid',    'پرداخت شده'),
+        ('failed',  'ناموفق'),
+        ('cancelled', 'لغو شده'),
+    ]
+    order      = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment', verbose_name='سفارش')
+    amount     = models.PositiveBigIntegerField(verbose_name='مبلغ (ریال)')
+    authority  = models.CharField(max_length=100, blank=True, verbose_name='کد مرجع درگاه')
+    ref_id     = models.CharField(max_length=100, blank=True, verbose_name='شماره پیگیری')
+    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name='وضعیت')
+    provider   = models.CharField(max_length=30, default='mock', verbose_name='درگاه')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name        = 'پرداخت'
+        verbose_name_plural = 'پرداخت‌ها'
+
+    def __str__(self):
+        return f'{self.order.order_number} — {self.get_status_display()}'
+
+
 class Invoice(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice', verbose_name='سفارش')
     invoice_number = models.CharField(max_length=20, unique=True, default=_invoice_number, verbose_name='شماره فاکتور')
