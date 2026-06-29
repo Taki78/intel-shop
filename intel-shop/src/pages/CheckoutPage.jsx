@@ -6,6 +6,7 @@ import { useAddress } from '../context/AddressContext'
 import { useAuth } from '../context/AuthContext'
 import { formatPrice } from '../utils/price'
 import { useProvinces } from '../utils/useProvinces'
+import { IRAN_CITIES } from '../utils/iranGeo'
 import api from '../utils/api'
 
 const steps = [
@@ -202,14 +203,30 @@ export default function CheckoutPage() {
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">استان</label>
-                <select required value={address.province} onChange={(e) => setAddress((p) => ({ ...p, province: e.target.value }))} className="input">
+                <select
+                  required
+                  value={address.province}
+                  onChange={(e) => setAddress((p) => ({ ...p, province: e.target.value, city: '' }))}
+                  className="input"
+                >
                   <option value="">انتخاب استان</option>
                   {provinces.map((p) => <option key={p}>{p}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">شهر</label>
-                <input required value={address.city} onChange={(e) => setAddress((p) => ({ ...p, city: e.target.value }))} className="input" placeholder="نام شهر" />
+                <select
+                  required
+                  value={address.city}
+                  onChange={(e) => setAddress((p) => ({ ...p, city: e.target.value }))}
+                  className="input"
+                  disabled={!address.province}
+                >
+                  <option value="">انتخاب شهر</option>
+                  {(IRAN_CITIES[address.province] || []).map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">کد پستی</label>

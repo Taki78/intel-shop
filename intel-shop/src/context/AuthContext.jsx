@@ -29,15 +29,15 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  async function login(email, password) {
+  async function login(identifier, password) {
     setLoading(true)
     setError(null)
     try {
-      const { data } = await api.post('/auth/login/', { email, password })
+      const { data } = await api.post('/auth/login/', { identifier, password })
       saveSession(data.user, { access: data.access, refresh: data.refresh })
       return { success: true }
     } catch (err) {
-      const msg = err.response?.data?.detail || 'ایمیل یا رمز عبور اشتباه است'
+      const msg = err.response?.data?.detail || 'اطلاعات ورود اشتباه است'
       setError(msg)
       return { success: false }
     } finally {

@@ -4,7 +4,7 @@ import { Cpu, Eye, EyeOff, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
   const { user, login, loading, error } = useAuth()
@@ -17,7 +17,7 @@ export default function LoginPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const res = await login(email, password)
+    const res = await login(identifier, password)
     if (res.success) {
       navigate(adminOnly ? '/admin' : next ?? '/account')
     }
@@ -50,12 +50,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">ایمیل</label>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">شماره موبایل یا ایمیل</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder=""
               className="input"
               dir="ltr"
               required

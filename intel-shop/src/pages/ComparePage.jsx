@@ -56,8 +56,13 @@ export default function ComparePage() {
     )
   }
 
-  const allSpecKeys = [...new Set(fullItems.flatMap(p => Object.keys(p.specs || {})))]
-    .filter(k => specLabels[k])
+  const allSpecKeys = [...new Set(
+    fullItems.flatMap(p =>
+      Object.entries(p.specs || {})
+        .filter(([, v]) => v && String(v).trim())
+        .map(([k]) => k)
+    )
+  )].filter(k => specLabels[k])
 
   return (
     <div className="py-8">

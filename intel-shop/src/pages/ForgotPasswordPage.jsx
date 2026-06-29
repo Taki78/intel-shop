@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Cpu, Mail, Phone, Eye, EyeOff, CheckCircle, ArrowRight, Loader2, RefreshCw } from 'lucide-react'
+import { Cpu, Eye, EyeOff, CheckCircle, ArrowRight, Loader2, RefreshCw } from 'lucide-react'
 import api from '../utils/api'
 
-const RESEND_SECONDS = 120
+const RESEND_SECONDS = 600
 
 function Logo() {
   return (
@@ -86,7 +86,7 @@ function OTPInput({ value, onChange, disabled }) {
 
 export default function ForgotPasswordPage() {
   const [step, setStep]         = useState(1)
-  const [method, setMethod]     = useState('email')
+  const method                  = 'phone'
   const [value, setValue]       = useState('')
   const [otp, setOtp]           = useState('      ')
   const [resetToken, setToken]  = useState('')
@@ -189,40 +189,14 @@ export default function ForgotPasswordPage() {
               <p className="text-gray-500 text-sm mt-1">روش تأیید هویت را انتخاب کنید</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { id: 'email', icon: Mail,  label: 'ایمیل',        sub: 'کد به ایمیل ارسال می‌شود' },
-                { id: 'phone', icon: Phone, label: 'شماره موبایل', sub: 'کد پیامکی ارسال می‌شود' },
-              ].map(opt => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => { setMethod(opt.id); setValue(''); setError('') }}
-                  className={`p-4 rounded-xl border-2 text-right transition-all ${
-                    method === opt.id
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-100 bg-gray-50 hover:border-gray-200'
-                  }`}
-                >
-                  <opt.icon size={20} className={method === opt.id ? 'text-primary-600' : 'text-gray-400'} />
-                  <p className={`text-sm font-bold mt-2 ${method === opt.id ? 'text-primary-700' : 'text-gray-700'}`}>
-                    {opt.label}
-                  </p>
-                  <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{opt.sub}</p>
-                </button>
-              ))}
-            </div>
-
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1.5 block">
-                {method === 'email' ? 'ایمیل ثبت‌شده' : 'شماره موبایل ثبت‌شده'}
-              </label>
+              <label className="text-sm font-medium text-gray-700 mb-1.5 block">شماره موبایل ثبت‌شده</label>
               <input
-                type={method === 'email' ? 'email' : 'tel'}
+                type="tel"
                 value={value}
                 onChange={e => { setValue(e.target.value); setError('') }}
                 onKeyDown={e => e.key === 'Enter' && value && sendOTP()}
-                placeholder={method === 'email' ? 'example@email.com' : '09xxxxxxxxx'}
+                placeholder="09xxxxxxxxx"
                 className="input"
                 dir="ltr"
                 autoFocus

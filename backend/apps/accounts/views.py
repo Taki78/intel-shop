@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -12,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.notifications.services import send_otp, send_welcome
+from apps.notifications.services import send_otp
 
 from .models import User, Address, Province, OTPCode
 from .serializers import (
@@ -28,24 +27,14 @@ from .serializers import (
 OTP_RATE_LIMIT_PER_HOUR = 3
 
 
-def _normalize(method, value):
-    """Lowercase emails, strip whitespace."""
-    value = (value or '').strip()
-    if method == 'email':
-        value = value.lower()
-    return value
-
-
 def _validate_method_value(method, value):
-    """Return (error_response, normalized_value). error_response is None on success."""
-    if method not in ('email', 'phone'):
-        return Response({'detail': 'روش نامعتبر است'}, status=status.HTTP_400_BAD_REQUEST), None
+    """Only phone/SMS is supported for OTP delivery."""
+    if method != 'phone':
+        return Response({'detail': 'فقط شماره موبایل پشتیبانی می‌شود'}, status=status.HTTP_400_BAD_REQUEST), None
+    value = (value or '').strip()
     if not value:
-        return Response({'detail': 'مقدار الزامی است'}, status=status.HTTP_400_BAD_REQUEST), None
-    value = _normalize(method, value)
-    if method == 'email' and '@' not in value:
-        return Response({'detail': 'ایمیل نامعتبر است'}, status=status.HTTP_400_BAD_REQUEST), None
-    if method == 'phone' and not (value.isdigit() and len(value) in (10, 11)):
+        return Response({'detail': 'شماره موبایل الزامی است'}, status=status.HTTP_400_BAD_REQUEST), None
+    if not (value.isdigit() and len(value) in (10, 11)):
         return Response({'detail': 'شماره موبایل نامعتبر است'}, status=status.HTTP_400_BAD_REQUEST), None
     return None, value
 
@@ -162,21 +151,14 @@ class RegisterCompleteView(APIView):
             return Response({'detail': 'توکن منقضی شده — لطفاً دوباره کد بگیرید'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # Build user fields from the verified channel + whatever optional contact was added
-        if otp.method == 'email':
-            email = otp.value
-            phone = extra_phone
-        else:
-            email = extra_email
-            phone = otp.value
-        if not email:
-            return Response({'detail': 'ایمیل الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+        # Build user fields — phone is the verified channel, email is optional
+        phone = otp.value
+        email = extra_email if extra_email else None
 
-        # Double-check uniqueness — someone may have registered with the same email/phone
-        # between request and complete.
-        if User.objects.filter(email__iexact=email).exists():
-            return Response({'detail': 'این ایمیل قبلاً ثبت‌نام کرده است'}, status=status.HTTP_400_BAD_REQUEST)
-        if phone and User.objects.filter(phone=phone).exists():
+        # Double-check uniqueness
+        if email and User.objects.filter(email__iexact=email).exists():
+            return Response({'detail': 'این ایمیل قبلاً استفاده شده است'}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(phone=phone).exists():
             return Response({'detail': 'این شماره موبایل قبلاً ثبت‌نام کرده است'},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -189,11 +171,6 @@ class RegisterCompleteView(APIView):
         otp.used = True
         otp.save(update_fields=['used'])
 
-        # Welcome email is best-effort; don't fail the whole registration on it
-        try:
-            send_welcome(user)
-        except Exception:
-            pass
 
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -212,12 +189,17 @@ class LoginView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(
-            email=serializer.validated_data['email'],
-            password=serializer.validated_data['password'],
-        )
-        if not user or not user.is_active:
-            return Response({'detail': 'ایمیل یا رمز عبور اشتباه است'},
+        identifier = serializer.validated_data['identifier'].strip()
+        password = serializer.validated_data['password']
+
+        # Route by identifier: email contains '@', otherwise treat as phone
+        if '@' in identifier:
+            user = User.objects.filter(email__iexact=identifier, is_active=True).first()
+        else:
+            user = User.objects.filter(phone=identifier, is_active=True).first()
+
+        if not user or not user.check_password(password):
+            return Response({'detail': 'اطلاعات ورود اشتباه است'},
                             status=status.HTTP_401_UNAUTHORIZED)
 
         refresh = RefreshToken.for_user(user)

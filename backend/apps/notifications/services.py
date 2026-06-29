@@ -42,49 +42,11 @@ def send_email(to, subject, body, html_body=None):
 
 # ─── High-level helpers used by auth views ───────────────────────────────────
 def send_otp(method, value, code, purpose):
-    """Dispatch an OTP via the right channel with a localized message.
-    `purpose` is one of 'register', 'reset' — drives the wording."""
+    """Send OTP via SMS. method must be 'phone'."""
     if purpose == 'register':
-        sms_text = f'کد تأیید ثبت‌نام شما در اینتل شاپ: {code}\nاین کد تا ۲ دقیقه معتبر است.'
-        email_subject = 'کد تأیید ثبت‌نام — اینتل شاپ'
-        email_text = (
-            f'کاربر گرامی،\n\n'
-            f'کد تأیید ثبت‌نام شما در فروشگاه اینتل شاپ:\n\n'
-            f'    {code}\n\n'
-            f'این کد تا ۲ دقیقه معتبر است.\n'
-            f'اگر شما درخواست ثبت‌نام نکرده‌اید، این پیام را نادیده بگیرید.\n\n'
-            f'با احترام،\nتیم اینتل شاپ'
-        )
+        sms_text = f'کد تأیید ثبت‌نام اینتل شاپ: {code}'
     elif purpose == 'reset':
-        sms_text = f'کد بازیابی رمز عبور اینتل شاپ: {code}\nاین کد تا ۲ دقیقه معتبر است.'
-        email_subject = 'کد بازیابی رمز عبور — اینتل شاپ'
-        email_text = (
-            f'کاربر گرامی،\n\n'
-            f'کد بازیابی رمز عبور شما در اینتل شاپ:\n\n'
-            f'    {code}\n\n'
-            f'این کد تا ۲ دقیقه معتبر است.\n'
-            f'اگر شما درخواست بازیابی نکرده‌اید، این پیام را نادیده بگیرید.\n\n'
-            f'با احترام،\nتیم اینتل شاپ'
-        )
+        sms_text = f'کد بازیابی رمز عبور اینتل شاپ: {code}'
     else:
         raise ValueError(f'unknown OTP purpose: {purpose}')
-
-    if method == 'phone':
-        return send_sms(value, sms_text)
-    elif method == 'email':
-        return send_email(value, email_subject, email_text)
-    else:
-        raise ValueError(f'unknown OTP method: {method}')
-
-
-def send_welcome(user):
-    """Sent once after a successful registration."""
-    if user.email:
-        send_email(
-            user.email,
-            'خوش آمدید به اینتل شاپ',
-            (f'سلام {user.name}،\n\n'
-             f'حساب کاربری شما در فروشگاه اینتل شاپ با موفقیت ساخته شد.\n'
-             f'با آرزوی خریدی خوب،\n\n'
-             f'تیم اینتل شاپ'),
-        )
+    return send_sms(value, sms_text)

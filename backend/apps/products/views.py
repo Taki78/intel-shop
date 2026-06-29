@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Count, Q, Avg, Prefetch
 from .models import Category, Brand, Product, Review, ReviewLike
 from .serializers import (
     CategorySerializer, BrandSerializer,
@@ -43,6 +43,10 @@ class ProductListView(generics.ListAPIView):
             .filter(is_active=True)
             .select_related('category', 'brand')
             .prefetch_related('images')
+            .annotate(
+                _reviews_count=Count('reviews', filter=Q(reviews__status='approved')),
+                _rating_avg=Avg('reviews__rating', filter=Q(reviews__status='approved')),
+            )
         )
 
 
@@ -58,6 +62,10 @@ class ProductDetailView(generics.RetrieveAPIView):
             .filter(is_active=True)
             .select_related('category', 'brand', 'specs')
             .prefetch_related('images', Prefetch('reviews', queryset=approved_reviews))
+            .annotate(
+                _reviews_count=Count('reviews', filter=Q(reviews__status='approved')),
+                _rating_avg=Avg('reviews__rating', filter=Q(reviews__status='approved')),
+            )
         )
 
 

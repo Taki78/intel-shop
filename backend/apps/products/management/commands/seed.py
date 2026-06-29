@@ -1,6 +1,16 @@
 from django.core.management.base import BaseCommand
 from apps.products.models import Category, Brand, Product, ProductImage, ProductSpec
 from apps.discounts.models import DiscountCode
+from apps.accounts.models import Province
+
+PROVINCES = [
+    'آذربایجان شرقی', 'آذربایجان غربی', 'اردبیل', 'اصفهان', 'البرز',
+    'ایلام', 'بوشهر', 'تهران', 'چهارمحال و بختیاری', 'خراسان جنوبی',
+    'خراسان رضوی', 'خراسان شمالی', 'خوزستان', 'زنجان', 'سمنان',
+    'سیستان و بلوچستان', 'فارس', 'قزوین', 'قم', 'کردستان',
+    'کرمان', 'کرمانشاه', 'کهگیلویه و بویراحمد', 'گلستان', 'گیلان',
+    'لرستان', 'مازندران', 'مرکزی', 'هرمزگان', 'همدان', 'یزد',
+]
 
 CATEGORIES = [
     {'name': 'لپ‌تاپ نو',       'slug': 'laptop-new',  'icon': 'laptop',   'order': 1},
@@ -285,7 +295,6 @@ PRODUCTS = [
                   'gpu': 'NVIDIA GeForce RTX 3050 4GB', 'display': '15.6 اینچ FHD IPS 120Hz',
                   'os': 'Windows 11 Home', 'weight': '2.2 کیلوگرم', 'battery': '45Wh'},
     },
-]
 
     # ===== DESKTOP COMPUTERS =====
     {
@@ -413,6 +422,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write('در حال بارگذاری داده‌ها...')
+
+        for i, name in enumerate(PROVINCES, 1):
+            Province.objects.get_or_create(name=name, defaults={'order': i})
+        self.stdout.write(f'  ✓ {len(PROVINCES)} استان')
 
         for cat in CATEGORIES:
             Category.objects.update_or_create(slug=cat['slug'], defaults=cat)

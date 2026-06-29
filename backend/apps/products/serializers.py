@@ -48,6 +48,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     brand = serializers.SlugRelatedField(slug_field='name', read_only=True)
     images = serializers.SerializerMethodField()
     discount_percent = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -63,6 +65,20 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_discount_percent(self, obj):
         return obj.discount_percent
+
+    def get_reviews_count(self, obj):
+        if hasattr(obj, '_reviews_count'):
+            return obj._reviews_count
+        return obj.reviews.filter(status='approved').count()
+
+    def get_rating(self, obj):
+        if hasattr(obj, '_rating_avg'):
+            val = obj._rating_avg
+            return round(float(val), 1) if val is not None else 0
+        ratings = list(obj.reviews.filter(status='approved').values_list('rating', flat=True))
+        if not ratings:
+            return 0
+        return round(sum(ratings) / len(ratings), 1)
 
 
 class ProductDetailSerializer(ProductListSerializer):

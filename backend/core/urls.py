@@ -21,6 +21,6 @@ api_patterns = [
 ]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('djadmin/', admin.site.urls),
     path('api/', include(api_patterns)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

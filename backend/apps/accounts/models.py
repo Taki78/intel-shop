@@ -7,11 +7,10 @@ from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('ایمیل الزامی است')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+    def create_user(self, email=None, password=None, **extra_fields):
+        if email:
+            email = self.normalize_email(email)
+        user = self.model(email=email or None, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -23,7 +22,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True, verbose_name='ایمیل')
+    email = models.EmailField(unique=True, blank=True, null=True, verbose_name='ایمیل')
     name = models.CharField(max_length=150, verbose_name='نام')
     phone = models.CharField(max_length=15, blank=True, verbose_name='موبایل')
     is_active = models.BooleanField(default=True, verbose_name='فعال')
@@ -111,7 +110,7 @@ class OTPCode(models.Model):
         verbose_name_plural = 'کدهای یک‌بارمصرف'
         indexes = [models.Index(fields=['purpose', 'method', 'value'])]
 
-    LIFETIME = timedelta(minutes=2)
+    LIFETIME = timedelta(minutes=10)
 
     @classmethod
     def generate(cls, purpose, method, value):

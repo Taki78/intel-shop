@@ -9,6 +9,7 @@ import { formatPrice } from '../utils/price'
 import { toPersianNum } from '../utils/jalali'
 import api from '../utils/api'
 import { useProvinces } from '../utils/useProvinces'
+import { IRAN_CITIES } from '../utils/iranGeo'
 
 const STATUS_COLOR = {
   pending:    'text-amber-600 bg-amber-50',
@@ -27,7 +28,7 @@ export default function AccountPage() {
   const provinces = useProvinces()
   const [tab, setTab] = useState('profile')
   const [editing, setEditing] = useState(false)
-  const [form, setForm] = useState({ name: user?.name || '', phone: user?.phone || '' })
+  const [form, setForm] = useState({ name: user?.name || '', phone: user?.phone || '', email: user?.email || '' })
 
   // Orders state
   const [orders, setOrders] = useState([])
@@ -133,7 +134,7 @@ export default function AccountPage() {
                 <span className="text-primary-700 font-black text-2xl">{user.name.charAt(0)}</span>
               </div>
               <p className="font-bold text-gray-800">{user.name}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
+              <p className="text-xs text-gray-500 mt-0.5 dir-ltr">{user.phone || user.email || ''}</p>
             </div>
             <nav className="card p-2 space-y-1">
               {tabs.map((t) => (
@@ -183,6 +184,10 @@ export default function AccountPage() {
                       <label className="text-xs text-gray-500 mb-1 block">موبایل</label>
                       <input value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="input" dir="ltr" placeholder="09..." />
                     </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">ایمیل (اختیاری)</label>
+                      <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="input" dir="ltr" placeholder="example@email.com" />
+                    </div>
                     <div className="flex gap-2">
                       <button type="submit" className="btn-primary text-sm py-2">ذخیره</button>
                       <button type="button" onClick={() => setEditing(false)} className="btn-ghost text-sm py-2">انصراف</button>
@@ -190,10 +195,14 @@ export default function AccountPage() {
                   </form>
                 ) : (
                   <div className="space-y-4">
-                    {[['نام', user.name], ['ایمیل', user.email], ['موبایل', user.phone || 'ثبت نشده']].map(([label, val]) => (
+                    {[
+                      ['نام', user.name],
+                      ['موبایل', user.phone || 'ثبت نشده'],
+                      ...(user.email ? [['ایمیل', user.email]] : []),
+                    ].map(([label, val]) => (
                       <div key={label} className="flex items-center justify-between py-3 border-b last:border-0">
                         <span className="text-sm text-gray-500">{label}</span>
-                        <span className="text-sm font-medium text-gray-800">{val}</span>
+                        <span className="text-sm font-medium text-gray-800 dir-ltr">{val}</span>
                       </div>
                     ))}
                   </div>
@@ -245,14 +254,30 @@ export default function AccountPage() {
                         </div>
                         <div>
                           <label className="text-xs text-gray-500 mb-1 block">استان</label>
-                          <select required value={addressForm.province} onChange={(e) => af('province', e.target.value)} className="input">
+                          <select
+                            required
+                            value={addressForm.province}
+                            onChange={(e) => { af('province', e.target.value); af('city', '') }}
+                            className="input"
+                          >
                             <option value="">انتخاب استان</option>
                             {provinces.map((p) => <option key={p}>{p}</option>)}
                           </select>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500 mb-1 block">شهر</label>
-                          <input required value={addressForm.city} onChange={(e) => af('city', e.target.value)} className="input" placeholder="نام شهر" />
+                          <select
+                            required
+                            value={addressForm.city}
+                            onChange={(e) => af('city', e.target.value)}
+                            className="input"
+                            disabled={!addressForm.province}
+                          >
+                            <option value="">انتخاب شهر</option>
+                            {(IRAN_CITIES[addressForm.province] || []).map((c) => (
+                              <option key={c}>{c}</option>
+                            ))}
+                          </select>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500 mb-1 block">کد پستی</label>

@@ -22,7 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    identifier = serializers.CharField()  # phone or email
     password = serializers.CharField()
 
 
@@ -34,9 +34,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=False, allow_null=True, allow_blank=True)
+
     class Meta:
         model = User
-        fields = ['name', 'phone']
+        fields = ['name', 'phone', 'email']
+
+    def validate_email(self, value):
+        if not value:
+            return None
+        qs = User.objects.filter(email__iexact=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError('این ایمیل قبلاً استفاده شده است')
+        return value.lower()
 
 
 class ChangePasswordSerializer(serializers.Serializer):

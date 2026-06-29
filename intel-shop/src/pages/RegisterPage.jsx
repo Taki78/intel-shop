@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, Navigate } from 'react-router-dom'
-import {
-  Cpu, Mail, Smartphone, ArrowRight, ArrowLeft, Loader2, ShieldCheck,
-} from 'lucide-react'
+import { Cpu, ArrowRight, ArrowLeft, Loader2, ShieldCheck } from 'lucide-react'
 import api from '../utils/api'
 import { useAuth } from '../context/AuthContext'
 
-const STEPS = { CHANNEL: 1, CODE: 2, DETAILS: 3 }
+const STEPS = { PHONE: 1, CODE: 2, DETAILS: 3 }
 
 const P_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => P_DIGITS[d])
@@ -26,45 +24,24 @@ function StepIndicator({ step }) {
   )
 }
 
-function StepChannel({ method, setMethod, value, setValue, onSubmit, loading, error }) {
+function StepPhone({ value, setValue, onSubmit, loading, error }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <p className="text-sm text-gray-500 text-center mb-4">روش تأیید را انتخاب کنید</p>
-
-      <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => setMethod('email')}
-          className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1.5 ${
-            method === 'email' ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'
-          }`}>
-          <Mail size={18} />
-          <span className="text-sm font-semibold">ایمیل</span>
-        </button>
-        <button type="button" onClick={() => setMethod('phone')}
-          className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1.5 ${
-            method === 'phone' ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'
-          }`}>
-          <Smartphone size={18} />
-          <span className="text-sm font-semibold">پیامک</span>
-        </button>
-      </div>
-
+      <p className="text-sm text-gray-500 text-center mb-4">کد تأیید به شماره موبایل شما ارسال می‌شود</p>
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1 block">
-          {method === 'email' ? 'ایمیل' : 'شماره موبایل'}
-        </label>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">شماره موبایل</label>
         <input
-          type={method === 'email' ? 'email' : 'tel'}
+          type="tel"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder={method === 'email' ? 'example@email.com' : '09123456789'}
+          placeholder="09123456789"
           className="input"
           dir="ltr"
+          autoFocus
           required
         />
       </div>
-
       {error && <p className="text-red-600 text-sm bg-red-50 rounded-lg p-3">{error}</p>}
-
       <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 gap-2">
         {loading ? <Loader2 size={18} className="animate-spin" /> : <ArrowLeft size={18} />}
         ارسال کد تأیید
@@ -156,7 +133,7 @@ function StepCode({ method, value, code, setCode, onSubmit, onResend, onBack, lo
   )
 }
 
-function StepDetails({ method, form, setField, onSubmit, loading, error }) {
+function StepDetails({ form, setField, onSubmit, loading, error }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <p className="text-sm text-gray-500 text-center mb-4">اطلاعات حساب را تکمیل کنید</p>
@@ -164,23 +141,8 @@ function StepDetails({ method, form, setField, onSubmit, loading, error }) {
       <div>
         <label className="text-sm font-medium text-gray-700 mb-1 block">نام و نام خانوادگی</label>
         <input value={form.name} onChange={(e) => setField('name', e.target.value)}
-          className="input" placeholder="نام کامل" required />
+          className="input" placeholder="نام کامل" autoFocus required />
       </div>
-
-      {method === 'phone' && (
-        <div>
-          <label className="text-sm font-medium text-gray-700 mb-1 block">ایمیل (الزامی)</label>
-          <input type="email" value={form.email} onChange={(e) => setField('email', e.target.value)}
-            className="input" dir="ltr" placeholder="example@email.com" required />
-        </div>
-      )}
-      {method === 'email' && (
-        <div>
-          <label className="text-sm font-medium text-gray-700 mb-1 block">شماره موبایل (اختیاری)</label>
-          <input type="tel" value={form.phone} onChange={(e) => setField('phone', e.target.value)}
-            className="input" dir="ltr" placeholder="09123456789" />
-        </div>
-      )}
 
       <div>
         <label className="text-sm font-medium text-gray-700 mb-1 block">رمز عبور</label>
@@ -209,22 +171,22 @@ export default function RegisterPage() {
 
   if (user) return <Navigate to="/account" replace />
 
-  const [step, setStep] = useState(STEPS.CHANNEL)
-  const [method, setMethod] = useState('email')
+  const method = 'phone'
+  const [step, setStep] = useState(STEPS.PHONE)
   const [value, setValue] = useState('')
   const [code, setCode] = useState('')
   const [registrationToken, setRegistrationToken] = useState('')
   const [debugCode, setDebugCode] = useState('')
-  const [expiresIn, setExpiresIn] = useState(120)
+  const [expiresIn, setExpiresIn] = useState(600)
 
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' })
+  const [form, setForm] = useState({ name: '', password: '', confirm: '' })
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }))
 
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
   const [error, setError] = useState('')
 
-  async function submitChannel(e) {
+  async function submitPhone(e) {
     e.preventDefault()
     setLoading(true); setError('')
     try {
@@ -254,13 +216,8 @@ export default function RegisterPage() {
     e.preventDefault()
     setLoading(true); setError('')
     try {
-      const { data } = await api.post('/auth/register/verify/', {
-        method, value: value.trim(), code,
-      })
+      const { data } = await api.post('/auth/register/verify/', { method, value: value.trim(), code })
       setRegistrationToken(data.registration_token)
-      // Pre-fill the verified channel into form
-      if (method === 'email') setField('email', value.trim())
-      else setField('phone', value.trim())
       setStep(STEPS.DETAILS)
     } catch (err) {
       setError(err.response?.data?.detail || 'کد نامعتبر است')
@@ -269,20 +226,15 @@ export default function RegisterPage() {
 
   async function submitDetails(e) {
     e.preventDefault()
-    if (form.password !== form.confirm) {
-      setError('رمز عبور و تکرار آن مطابقت ندارند'); return
-    }
+    if (form.password !== form.confirm) { setError('رمز عبور و تکرار آن مطابقت ندارند'); return }
     setLoading(true); setError('')
     try {
-      const payload = {
+      const { data } = await api.post('/auth/register/complete/', {
         registration_token: registrationToken,
         name: form.name,
         password: form.password,
         confirm: form.confirm,
-      }
-      if (method === 'phone') payload.email = form.email
-      if (method === 'email' && form.phone) payload.phone = form.phone
-      const { data } = await api.post('/auth/register/complete/', payload)
+      })
       adoptSession(data)
       navigate('/account')
     } catch (err) {
@@ -306,26 +258,22 @@ export default function RegisterPage() {
 
         <StepIndicator step={step} />
 
-        {step === STEPS.CHANNEL && (
-          <StepChannel
-            method={method} setMethod={setMethod}
-            value={value} setValue={setValue}
-            onSubmit={submitChannel} loading={loading} error={error}
-          />
+        {step === STEPS.PHONE && (
+          <StepPhone value={value} setValue={setValue}
+            onSubmit={submitPhone} loading={loading} error={error} />
         )}
         {step === STEPS.CODE && (
           <StepCode
             method={method} value={value} code={code} setCode={setCode}
             onSubmit={submitCode} onResend={resendCode}
-            onBack={() => { setStep(STEPS.CHANNEL); setError(''); setCode('') }}
+            onBack={() => { setStep(STEPS.PHONE); setError(''); setCode('') }}
             loading={loading} resending={resending} error={error}
             expiresIn={expiresIn} debugCode={debugCode}
           />
         )}
         {step === STEPS.DETAILS && (
-          <StepDetails method={method} form={form} setField={setField}
-            onSubmit={submitDetails} loading={loading} error={error}
-          />
+          <StepDetails form={form} setField={setField}
+            onSubmit={submitDetails} loading={loading} error={error} />
         )}
 
         <p className="text-center text-sm text-gray-500 mt-6">
